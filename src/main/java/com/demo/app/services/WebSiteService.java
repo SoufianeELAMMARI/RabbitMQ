@@ -4,6 +4,7 @@ package com.demo.app.services;
 import com.demo.app.Configuration.RabbitMQ.RabbitMQSender;
 import com.demo.app.entities.Website;
 import com.demo.app.repositories.WebSiteRepository;
+import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,5 +23,11 @@ public class WebSiteService {
 
         rabbitMQSender.send(new Website("url","title","desc"));
         return webSiteRepository.findAll();
+    }
+
+
+    @RabbitListener(queues = "${rabbitmq.queue}")
+    public void recievedMessage(Object o) {
+        System.out.println("Recieved Message From RabbitMQ: " + o);
     }
 }
