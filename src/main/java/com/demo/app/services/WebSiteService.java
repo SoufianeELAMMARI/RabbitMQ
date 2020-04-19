@@ -7,8 +7,8 @@ import com.demo.app.repositories.WebSiteRepository;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 
 @Service
 public class WebSiteService {
@@ -19,10 +19,12 @@ public class WebSiteService {
     @Autowired
     RabbitMQSender rabbitMQSender;
 
-    public List<Website> getAllWebSites(){
-
-        rabbitMQSender.send(new Website("url","title","desc"));
-        return webSiteRepository.findAll();
+    @Transactional
+    public Website sendWebSite(){
+        Website website=new Website("www.google.com","Google","Search engine ");
+        website=webSiteRepository.save(website);
+        rabbitMQSender.send(website);
+        return website;
     }
 
 
